@@ -34,13 +34,13 @@ async function getPlayersInfo(players_ids_list) {
 
 function extractRelevantPlayerData(players_info) {
   return players_info.map((player_info) => {
-    const { fullname, image_path, position_id } = player_info.data.data;
-    const { name } = player_info.data.data.team.data;
+    const { data_fullname, data_image_url, data_position_id } = player_info.data.data;
+    const { data_team_name } = player_info.data.data.team.data;
     return {
-      name: fullname,
-      image: image_path,
-      position: position_id,
-      team_name: name,
+      data_fullname: data_fullname,
+      image_url: data_image_url,
+      position: data_position_id,
+      team_name: data_team_name,
     };
   });
 }

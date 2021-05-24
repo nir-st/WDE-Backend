@@ -13,12 +13,12 @@ var logger = require("morgan");
 var cors = require("cors");
 
 var app = express();
-app.use(logger("dev")); //logger
+app.use(logger("dev")); // logger
 app.use(express.json()); // parse application/json
 app.use(
   session({
     cookieName: "session", // the cookie key name
-    secret: 'amitisgay', // the encryption key
+    secret: process.env.COOKIE_SECRET, // the encryption key
     duration: 24 * 60 * 60 * 1000, // expired after 20 sec
     activeDuration: 1000 * 60 * 5, // if expiresIn < activeDuration,
     cookie: {
@@ -52,13 +52,14 @@ const auth = require("./routes/auth");
 const users = require("./routes/users");
 const league = require("./routes/league");
 const teams = require("./routes/teams");
+const players = require("./routes/players");
 
 //#endregion
 
 //#region cookie middleware
 app.use(function (req, res, next) {
   if (req.session && req.session.user_id) {
-    DButils.execQuery("SELECT user_id FROM users")
+    DButils.execQuery("SELECT user_id FROM Users")
       .then((users) => {
         if (users.find((x) => x.user_id === req.session.user_id)) {
           req.user_id = req.session.user_id;
@@ -79,6 +80,7 @@ app.get("/alive", (req, res) => res.send("I'm alive"));
 app.use("/users", users);
 app.use("/league", league);
 app.use("/teams", teams);
+app.use("/players", players);
 app.use(auth);
 
 app.use(function (err, req, res, next) {

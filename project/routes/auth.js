@@ -9,11 +9,11 @@ router.post("/Register", async (req, res, next) => {
     // valid parameters
     // username exists
     const users = await DButils.execQuery(
-      "SELECT username FROM dbo.users_tirgul"
+      "SELECT username FROM dbo.Users"
     );
 
     if (users.find((x) => x.username === req.body.username))
-      throw { status: 409, message: "Username taken" };
+      throw { status: 409, message: "Username taken." };
 
     //hash the password
     let hash_password = bcrypt.hashSync(
@@ -24,9 +24,9 @@ router.post("/Register", async (req, res, next) => {
 
     // add the new username
     await DButils.execQuery(
-      `INSERT INTO dbo.users_tirgul (username, password) VALUES ('${req.body.username}', '${hash_password}')`
+      `INSERT INTO dbo.Users (UserName, Password) VALUES ('${req.body.username}', '${hash_password}')`
     );
-    res.status(201).send("user created");
+    res.status(201).send("User created successfully.");
   } catch (error) {
     next(error);
   }
@@ -36,22 +36,21 @@ router.post("/Login", async (req, res, next) => {
   try {
     const user = (
       await DButils.execQuery(
-        `SELECT * FROM dbo.users_tirgul WHERE username = '${req.body.username}'`
+        `SELECT * FROM dbo.Users WHERE UserName = '${req.body.username}'`
       )
     )[0];
     // user = user[0];
-    console.log(user);
 
     // check that username exists & the password is correct
-    if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
-      throw { status: 401, message: "Username or Password incorrect" };
+    if (!user || !bcrypt.compareSync(req.body.password, user.Password)) {
+      throw { status: 401, message: "Incorrect username or password." };
     }
 
     // Set cookie
     req.session.user_id = user.user_id;
 
     // return cookie
-    res.status(200).send("login succeeded");
+    res.status(200).send("Login succeeded.");
   } catch (error) {
     next(error);
   }
@@ -59,7 +58,7 @@ router.post("/Login", async (req, res, next) => {
 
 router.post("/Logout", function (req, res) {
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
-  res.send({ success: true, message: "logout succeeded" });
+  res.send({ success: true, message: "Logout succeeded." });
 });
 
 module.exports = router;
