@@ -1,8 +1,11 @@
 openapi: 3.0.0
 info:
-  title: api
-  description: API for  project
-  version: 1.0.0
+  description: This is an API for assignment 3 in Web Development Environments course, made by Omer Marco and Nir Stenifeld.
+  version: "1.0.0"
+  title: Assignment 3.1
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
   - name: Users
   - name: Auth
@@ -11,62 +14,75 @@ tags:
   - name: Teams
   - name: Games
 paths:
-  /Register:
+  /login:
     post:
       tags:
         - Auth
-      summary: Add new user
-      description: A new user from the client is added to the server
+      summary: A login request from the user
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: '#/components/schemas/LoginRequest'
       responses:
-        "201":
-          description: A new user has been added
-        "400":
-          description: wrong input parameters
-  /Login:
+        '200':
+          description: 'User succesfully logged in'
+        '401':
+          description: 'Wrong username/password'
+  /register:
     post:
       tags:
         - Auth
-      summary: Login an exist user
-      description: An exist user login to the system
+      summary: A new user from the client is added to the server
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginScheme"
+              $ref: '#/components/schemas/User'
+        description: Inventory item to add      
       responses:
-        "200":
-          description: >
-            User was found in the DB and authenitcated successfully.
-            The session ID is returned in a cookie named `session`. 
-            You should include this cookie in subsequent requests
-          # headers:
-          #   Set-Cookie:
-          #     schema:
-          #       type: string
-          #       example: session=87s97sdhgf279293f8w0e9
-            # Note that the Set-Cookie header and securitySchemes are not connected in any way, and the Set-Header definition is for documentation purposes only.
-        "401":
-          description: Authentication failed
+        '201':
+          description: 'A new user has been added'
+        '400':
+          description: 'Wrong input parameter'
+        '409':
+          description: 'Username taken'
   /logout:
     post:
       tags:
         - Auth
       summary: logout a user from the system and delete his cookie
       responses:
-        "200":
-          description: "the user has ben successfully logged out"
+        '200':
+          description: 'logged out successfully'
+  /players/playerDetails/{playerId}:
+    get:
+      tags:
+      - Players
+      summary: get full details on a player
+      parameters:
+        - in: path
+          name: playerId
+          description: player's ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'request succeed. returning full details'
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Player'
+        '404':
+          description: player id was not found
   /league/getDetails:
     get:
       tags:
-        - league
-      summary: Return the details about the current league
+        - League
+      summary: get details about the current league
       responses:
         "200":
           description: data about the current league returned
@@ -78,50 +94,11 @@ paths:
                   $ref: "#/components/schemas/League"
         "400":
           description: wrong input parameters
-  /users/favoritePlayers:
-    get:
-      tags:
-        - Users
-        - Players
-      summary: Return the favorite players that were saved by user
-      parameters:
-      responses:
-        "200":
-          description: data about the user's favorites players returned
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PlayerPreview"
-        "401":
-          description: user is not authorized
-    post:
-      summary: save player in the favorites list of a user
-      tags:
-        - Users
-        - Players
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                playerId:
-                  type: string
-                  description: player's id which the user saved
-                  example: 85
-      responses:
-        "201":
-          description: The player successfully saved as favorite
-        "401":
-          description: user is not authorized
   /teams/teamFullDetails/{teamId}:
     get:
-      summary: get full deatils about a team
-      description: useful for team page
       tags:
         - Teams
+      summary: get full details on a team
       parameters:
         - in: path
           name: teamId
@@ -130,73 +107,135 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
-          description: data about the team
+        '200':
+          description: request succeed. returning full details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Team"
-        "404":
-          description: teamId is not exists
+                  $ref: '#/components/schemas/Team'
+        '404':
+          description: team id does not exist
+  /games/futureGames/{teamId}:
+    get:
+      tags:
+        - Games
+        - Teams
+      summary: info about all future games of a team
+      parameters:
+        - in: path
+          name: teamId
+          description: team's id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: request succeed. returning details about future games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FutureGame'
+        '204':
+          description: 'no games were found'
+  /games/pastGames/{teamId}:
+    get:
+      tags:
+        - Games
+        - Teams
+      summary: info about all past games of a team
+      parameters:
+        - in: path
+          name: teamId
+          description: team's id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'request succeed. returning details about past games'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PastGame'
+        '204':
+          description: 'no games were found'
+  /games/nextLeagueGame:
+    get:
+      tags:
+        - Games
+        - League
+      summary: info about the next game in the league
+      responses:
+        '200':
+          description: 'request succeed. returning details about the game'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FutureGame'
+        '204':
+          description: 'no future games were found'
 components:
   schemas:
     User:
       type: object
+      description: Model containing user info
       properties:
         username:
-          maxLength: 8
-          minLength: 3
           type: string
-          description: username conatins between 3 to 8 letters only
-          example: ladygaga
+          minLength: 3
+          maxLength: 8
+          description: username. contains 3-8 lettters only
+          example: bigboi
         firstname:
           type: string
-          description: user's first name
-          example: Stefani
+          description: The user's first name
+          example: John
         lastname:
           type: string
-          description: user's last name
-          example: Germanotta
+          description: The user's last name
+          example: Cena
         country:
           type: string
-          description: user's country
-          example: USA
+          description: The user's country
+          example: Israel
         password:
-          maxLength: 10
-          minLength: 5
           type: string
-          description:
-            password conatins between 5 to 10 chars, at least one of them
-            is a number and a special char
           format: password
-          example: lady@56
+          minLength: 5
+          maxLength: 10
+          description: The user's password. 5-10 chars. At least 1 digit and 1 special char.
+          example: as3hm4l@
         email:
-          pattern: email
           type: string
-          description: user's email
-          example: ladygaga@gmail.com
+          format: email
+          description: The user's email address
+          example: john@cena.com
         image-url:
-          pattern: URL
           type: string
+          format: URL
           description: URL for the user's image
-          example: https://cloudinary.com/
-      description: Model containing user info
-    LoginScheme:
+          example: https://cloudinaru.com/myImage
+    LoginRequest:
       type: object
+      description: Model containing login info
       properties:
         username:
           type: string
           minLength: 3
           maxLength: 8
-          description: username conatins letters only
-          example: naorbe
+          description: username. contains 3-8 lettters only
+          example: bigboi
         password:
           type: string
+          format: password
           minLength: 5
           maxLength: 10
-          format: password
-          description: password conatins at least one number and one special char
-          example: naor@55
+          description: The user's password. 5-10 chars. At least 1 digit and 1 special char.
+          example: as3hm4l@
     League:
       type: object
       properties:
@@ -214,33 +253,141 @@ components:
           example: Championship Round
     PlayerPreview:
       type: object
+      description: A preview of a player
       properties:
+        id:
+          type: integer
+          description: The player's ID
+          example: 123456789
         name:
           type: string
-          description: player's name
-          example: Sten Michael Grytebust
-        image:
+          description: The player's name
+          example: 'Avi Nimni'
+        teamName:
           type: string
-          description: player's image
-          format: URL
-          example: https://cdn.sportmonks.com/images/soccer/players/11/84587.png
+          description: Player's team name
+          example: 'Maccabi Tel-Aviv'
         position:
           type: integer
-          description: player's position in team
+          description: player's position in the team
           example: 1
-        team_name:
+        image-url:
           type: string
-          description: player's team name
-          example: København
+          format: URL
+          description: URL for the player's image
+          example: https://cloudinaru.com/aviNimni
     Team:
       type: object
+      description: team's info
       properties:
+        id:
+          type: integer
+          description: The team's ID
+          example: 123456789
         name:
           type: string
-          description: team name
-          example: København
+          description: The team's name
+          example: 'Maccabi Tel-Aviv'
         players:
           type: array
           items:
-            type: object
             $ref: "#/components/schemas/PlayerPreview"
+    Player:
+      type: object
+      description: Full details of a player
+      properties:
+        id:
+          type: integer
+          description: players's ID
+          example: 123456789
+        name:
+          type: string
+          description: player's full name
+          example: 'Avi Nimni'
+        teamName:
+          type: string
+          description: player's team name
+          example: 'Maccabi Tel-Aviv'
+        position:
+          type: integer
+          description: player's position in the team
+          example: 1
+        image-url:
+          type: string
+          format: URL
+          description: URL for the player's image
+          example: https://cloudinaru.com/aviNimni
+        age:
+          type: integer
+          description: player's age
+          example: 30
+    FutureGame:
+      type: object
+      properties:
+        gameId:
+          type: integer
+          description: id of the game
+          example: 1
+        date:
+          type: string
+          format: date
+          description: date of the game
+          example: '2021-05-29'
+        time:
+          type: string
+          format: time
+          description: the time the game starts
+          example: '21:00'
+        homeTeamId:
+          type: integer
+          description: id of the home team
+          example: 8
+        awayTeamId:
+          type: integer
+          description: id of the away team
+          example: 9
+        stadium:
+          type: string
+          description: name of the stadium the game will take place in
+          example: 'Estádio do Dragão'
+    PastGame:
+      type: object
+      properties:
+        gameId:
+          type: integer
+          description: id of the game
+          example: 1
+        date:
+          type: string
+          format: date
+          description: date of the game
+          example: '2021-05-29'
+        time:
+          type: string
+          format: time
+          description: the time the game starts
+          example: '21:00'
+        homeTeamId:
+          type: integer
+          description: id of the home team
+          example: 8
+        awayTeamId:
+          type: integer
+          description: id of the away team
+          example: 9
+        stadium:
+          type: string
+          description: name of the stadium the game will take place in
+          example: 'Estádio do Dragão'
+        homeTeamScore:
+          type: integer
+          description: the number of the home team's goals in the game
+          example: 2
+        awayTeamScore:
+          type: integer
+          description: the number of the away team's goals in the game
+          example: 0
+        eventLogId:
+          type: integer
+          description: the id of the game's event log
+          example: 13

@@ -4,7 +4,6 @@ const DButils = require("./utils/DButils");
 const players_utils = require("./utils/players_utils");
 
 router.get("/player/:playerId", async (req, res, next) => {
-  let team_details = [];
   try {
     const player_info = await players_utils.getPlayersInfo(
       req.params.playerId
