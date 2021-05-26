@@ -1,5 +1,39 @@
 const DButils = require("./DButils");
 
+async function getTeamsPastGames(teamId) {
+    try {
+        const games = (
+            await DButils.execQuery(
+            `SELECT * FROM dbo.PastGames WHERE HomeTeamId = '${teamId}' OR AwayTeamId = '${teamId}'`
+            )
+        );
+
+        return games.map((game_info) => { 
+            return extractRelevantPastGameData(game_info); 
+        });
+
+        } catch (error) {
+        throw new Error(error);
+    }
+}
+
+async function getTeamsFutureGames(teamId) {
+    try {
+        const games = (
+            await DButils.execQuery(
+            `SELECT * FROM dbo.FutureGames WHERE HomeTeamId = '${teamId}' OR AwayTeamId = '${teamId}'`
+            )
+        );
+
+        return games.map((game_info) => { 
+            return extractRelevantFutureGameData(game_info); 
+        });
+
+        } catch (error) {
+        throw new Error(error);
+    }
+}
+
 async function getNextGameInfo() {
 
     const gameInfo = await DButils.execQuery(
@@ -40,3 +74,5 @@ function extractRelevantPastGameData(game_info) {
 exports.getNextGameInfo = getNextGameInfo;
 exports.extractRelevantFutureGameData = extractRelevantFutureGameData;
 exports.extractRelevantPastGameData = extractRelevantPastGameData;
+exports.getTeamsPastGames = getTeamsPastGames;
+exports.getTeamsFutureGames = getTeamsFutureGames;

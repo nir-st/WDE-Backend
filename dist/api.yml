@@ -115,54 +115,27 @@ paths:
                   $ref: '#/components/schemas/Team'
         '404':
           description: team id does not exist
-  /games/futureGames/{teamId}:
+  /teams/teamId/{teamName}:
     get:
       tags:
-        - Games
         - Teams
-      summary: info about all future games of a team
+      summary: get team's id by its name
       parameters:
         - in: path
-          name: teamId
-          description: team's id
+          name: teamName
+          description: team's name
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
-          description: request succeed. returning details about future games
+          description: request succeed. returning team's id
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FutureGame'
-        '204':
-          description: 'no games were found'
-  /games/pastGames/{teamId}:
-    get:
-      tags:
-        - Games
-        - Teams
-      summary: info about all past games of a team
-      parameters:
-        - in: path
-          name: teamId
-          description: team's id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: 'request succeed. returning details about past games'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PastGame'
-        '204':
-          description: 'no games were found'
+                  type: integer
+        '404':
+          description: team name does not exist
   /games/nextLeagueGame:
     get:
       tags:
@@ -259,7 +232,7 @@ components:
           type: integer
           description: The player's ID
           example: 123456789
-        name:
+        fullname:
           type: string
           description: The player's name
           example: 'Avi Nimni'
@@ -267,7 +240,7 @@ components:
           type: string
           description: Player's team name
           example: 'Maccabi Tel-Aviv'
-        position:
+        positionId:
           type: integer
           description: player's position in the team
           example: 1
@@ -288,10 +261,27 @@ components:
           type: string
           description: The team's name
           example: 'Maccabi Tel-Aviv'
+        founded:
+          type: integer
+          description: "the year the team was founded"
+          example: 2000
+        logoPath:
+          type: string
+          format: url
+          description: a url to the team's logo
+          example: "https://cdn.sportmonks.com/images//soccer/teams/11/939.png"
         players:
           type: array
           items:
             $ref: "#/components/schemas/PlayerPreview"
+        pastGames:
+          type: array
+          items:
+            $ref: "#/components/schemas/PastGame"
+        futureGames:
+          type: array
+          items:
+            $ref: "#/components/schemas/FutureGame"
     Player:
       type: object
       description: Full details of a player
