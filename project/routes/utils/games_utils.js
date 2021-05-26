@@ -1,3 +1,4 @@
+const { executionAsyncResource } = require("async_hooks");
 const DButils = require("./DButils");
 
 async function getTeamsPastGames(teamId) {
@@ -7,10 +8,12 @@ async function getTeamsPastGames(teamId) {
             `SELECT * FROM dbo.PastGames WHERE HomeTeamId = '${teamId}' OR AwayTeamId = '${teamId}'`
             )
         );
-
-        return games.map((game_info) => { 
-            return extractRelevantPastGameData(game_info); 
+        
+        const promises = games.map(async (game) => {
+            return await extractRelevantPastGameData(game);
         });
+
+        return Promise.all(promises);
 
         } catch (error) {
         throw new Error(error);
@@ -21,7 +24,7 @@ async function getTeamsFutureGames(teamId) {
     try {
         const games = (
             await DButils.execQuery(
-            `SELECT * FROM dbo.FutureGames WHERE HomeTeamId = '${teamId}' OR AwayTeamId = '${teamId}'`
+                `SELECT * FROM dbo.FutureGames WHERE HomeTeamId = '${teamId}' OR AwayTeamId = '${teamId}'`
             )
         );
 
@@ -30,6 +33,22 @@ async function getTeamsFutureGames(teamId) {
         });
 
         } catch (error) {
+        throw new Error(error);
+    }
+}
+
+async function getEventsByGameId(gameId) {
+
+    try {
+        const events = (
+            await DButils.execQuery(
+                `SELECT * FROM dbo.EventLog WHERE GameId = '${gameId}'`
+            )
+        );
+
+    return events;
+
+    } catch (error) {
         throw new Error(error);
     }
 }
@@ -46,7 +65,10 @@ async function getNextGameInfo() {
     return extractRelevantFutureGameData(gameInfo[0]);
 }
 
-function extractRelevantPastGameData(game_info) {
+async function extractRelevantPastGameData(game_info) {
+    
+    const game_events = await getEventsByGameId(game_info.GameId);
+    
     return {
         gameId: game_info.GameId,
         date: game_info.GameDate,
@@ -56,7 +78,7 @@ function extractRelevantPastGameData(game_info) {
         stadium: game_info.Stadium,
         homeTeamScore: game_info.HomeTeamScore,
         awayTeamScore: game_info.AwayTeamScore,
-        eventLogId: game_info.EventLogId,
+        eventLog: game_events,
     };
   }
 

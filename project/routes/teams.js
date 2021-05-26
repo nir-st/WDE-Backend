@@ -11,11 +11,11 @@ router.get("/teamFullDetails/:teamId", async (req, res, next) => {
     team_players = await players_utils.getPlayersByTeam(
       req.params.teamId
     );
-  
+    
+    const team_info = await teams_utils.getTeamInfo(req.params.teamId);
     const team_past_games = await games_utils.getTeamsPastGames(req.params.teamId);
     const team_future_games = await games_utils.getTeamsFutureGames(req.params.teamId);
-
-    const team_info = teams_utils.getTeamInfo(req.params.teamId);
+    
 
     res.send({
       id: req.params.teamId,
@@ -26,20 +26,6 @@ router.get("/teamFullDetails/:teamId", async (req, res, next) => {
       pastGames: team_past_games,
       futureGames: team_future_games,
     });
-
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get("/teamId/:teamName", async (req, res, next) => {
-  let team_players = [];
-  try {
-    teamId = await teams_utils.getTeamId(
-      req.params.teamId
-    );
-
-    res.send(teamId);
 
   } catch (error) {
     next(error);

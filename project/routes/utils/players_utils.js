@@ -37,8 +37,6 @@ function extractRelevantPlayerData(players_info) {
     const { id, fullname, image_path, position_id } = player_info.data.data;
     const { name } = player_info.data.data.team.data;
 
-    console.log(player_info.data.data); // DELETE
-
     return {
       id: id,
       fullname: fullname,

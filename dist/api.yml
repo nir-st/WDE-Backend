@@ -115,27 +115,6 @@ paths:
                   $ref: '#/components/schemas/Team'
         '404':
           description: team id does not exist
-  /teams/teamId/{teamName}:
-    get:
-      tags:
-        - Teams
-      summary: get team's id by its name
-      parameters:
-        - in: path
-          name: teamName
-          description: team's name
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: request succeed. returning team's id
-          content:
-            application/json:
-              schema:
-                  type: integer
-        '404':
-          description: team name does not exist
   /games/nextLeagueGame:
     get:
       tags:
@@ -377,7 +356,37 @@ components:
           type: integer
           description: the number of the away team's goals in the game
           example: 0
-        eventLogId:
+        eventLog:
+          type: array
+          description: array of the game's event
+          items:
+            $ref: "#/components/schemas/GameEvent"
+    GameEvent:
+      type: object
+      properties:
+        id:
           type: integer
-          description: the id of the game's event log
-          example: 13
+          description: id of the event
+          example: 23
+        gameId:
+          type: integer
+          description: id of the game
+          example: 24
+        date:
+          type: string
+          format: date
+          description: date of the event
+          example: 2020-05-24
+        time:
+          type: string
+          format: time
+          description: the time the event took place
+          example: 22:12
+        gameMinute:
+          type: integer
+          description: the minute in the game the event took place
+          example: 89
+        description:
+          type: string
+          description: a description of the event
+          example: Goal - Nimni

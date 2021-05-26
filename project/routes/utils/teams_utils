@@ -9,6 +9,8 @@ async function getTeamInfo(team_id) {
     },
   });
 
+  console.log(team);
+
   const {name, logo_path, venue_id, founded} = team.data;
 
   return {
@@ -19,20 +21,4 @@ async function getTeamInfo(team_id) {
   };
 }
 
-async function getTeamId(team_name) {
-    const team = await axios.get(`${api_domain}/teams/search/${team_name}`, {
-      params: {
-        api_token: process.env.api_token,
-      },
-    });
-  
-    console.log(team); //DELETE THIS
-
-    const {id} = team.data;
-  
-    return id;
-  }
-  
-
 exports.getTeamInfo = getTeamInfo;
-exports.getTeamId = getTeamId;
