@@ -13,6 +13,7 @@ tags:
   - name: Players
   - name: Teams
   - name: Games
+  - name: Search
 paths:
   /login:
     post:
@@ -115,6 +116,54 @@ paths:
                   $ref: '#/components/schemas/Team'
         '404':
           description: team id does not exist
+  /search/teams/{teamName}:
+    get:
+      tags:
+        - Search
+        - Teams
+      summary: get full details on a team
+      parameters:
+        - in: path
+          name: teamName
+          description: team's name or part or it
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: request succeed. returning list of team previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamPreview'
+        '204':
+          description: "no results"
+  /search/players/{playerName}:
+    get:
+      tags:
+        - Search
+        - Player
+      summary: get preview of players with that name in the leageu
+      parameters:
+        - in: path
+          name: playerName
+          description: player's first/last/full name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: request succeed. returning list of player previews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerPreview'
+        '204':
+          description: "no results"
   /games/nextLeagueGame:
     get:
       tags:
@@ -203,6 +252,35 @@ components:
           type: string
           description: current stage name
           example: Championship Round
+    Player:
+      type: object
+      description: Full details of a player
+      properties:
+        id:
+          type: integer
+          description: players's ID
+          example: 123456789
+        name:
+          type: string
+          description: player's full name
+          example: 'Avi Nimni'
+        teamName:
+          type: string
+          description: player's team name
+          example: 'Maccabi Tel-Aviv'
+        position:
+          type: integer
+          description: player's position in the team
+          example: 1
+        image_url:
+          type: string
+          format: URL
+          description: URL for the player's image
+          example: https://cloudinaru.com/aviNimni
+        age:
+          type: integer
+          description: player's age
+          example: 30
     PlayerPreview:
       type: object
       description: A preview of a player
@@ -223,11 +301,28 @@ components:
           type: integer
           description: player's position in the team
           example: 1
-        image-url:
+        image_url:
           type: string
           format: URL
           description: URL for the player's image
           example: https://cloudinaru.com/aviNimni
+    TeamPreview:
+      type: object
+      description: team's preview for the search
+      properties:
+        id:
+          type: integer
+          description: The team's ID
+          example: 123456789
+        name:
+          type: string
+          description: The team's name
+          example: 'Maccabi Tel-Aviv'
+        logoPath:
+          type: string
+          format: url
+          description: a url to the team's logo
+          example: "https://cdn.sportmonks.com/images//soccer/teams/11/939.png"
     Team:
       type: object
       description: team's info
@@ -261,35 +356,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FutureGame"
-    Player:
-      type: object
-      description: Full details of a player
-      properties:
-        id:
-          type: integer
-          description: players's ID
-          example: 123456789
-        name:
-          type: string
-          description: player's full name
-          example: 'Avi Nimni'
-        teamName:
-          type: string
-          description: player's team name
-          example: 'Maccabi Tel-Aviv'
-        position:
-          type: integer
-          description: player's position in the team
-          example: 1
-        image-url:
-          type: string
-          format: URL
-          description: URL for the player's image
-          example: https://cloudinaru.com/aviNimni
-        age:
-          type: integer
-          description: player's age
-          example: 30
     FutureGame:
       type: object
       properties:
