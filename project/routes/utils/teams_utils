@@ -10,12 +10,11 @@ async function getTeamInfo(team_id) {
     },
   });
 
-  const {name, logo_path, venue_id, founded} = team.data;
+  const {name, logo_path, venue_id, founded} = team.data.data;
 
   return {
       name: name,
       logo_path: logo_path,
-      venue_id: venue_id,
       founded: founded,
   };
 }
@@ -40,7 +39,6 @@ async function getTeamPreviewsByName(team_name) {
       });
     }
   });
-
 
   return league_teams;
 

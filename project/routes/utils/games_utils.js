@@ -58,7 +58,7 @@ async function getNextGameInfo() {
     const gameInfo = await DButils.execQuery(
         `SELECT *
         FROM dbo.FutureGames AS t
-        WHERE t.GameTimeStamp = (SELECT MIN(GameTimeStamp)
+        WHERE t.TimeStamp = (SELECT MIN(TimeStamp)
                      FROM dbo.FutureGames AS t2)`
     );
 
@@ -80,9 +80,9 @@ async function extractRelevantPastGameData(game_info) {
         awayTeamScore: game_info.AwayTeamScore,
         eventLog: game_events,
     };
-  }
+}
 
-  function extractRelevantFutureGameData(game_info) {
+function extractRelevantFutureGameData(game_info) {
     return {
         gameId: game_info.GameId,
         date: game_info.GameDate,
@@ -91,10 +91,41 @@ async function extractRelevantPastGameData(game_info) {
         awayTeamId: game_info.AwayTeamId,
         stadium: game_info.Stadium,
     };
-  }
+}
+
+async function getAllFutureGames() {
+    const gamesFromDB = await DButils.execQuery(
+        `SELECT * FROM dbo.FutureGames`
+    );
+
+    let extractedData = []
+
+    gamesFromDB.map((game) => {
+        extractedData.push(extractRelevantFutureGameData(game));
+    });
+
+    return extractedData;
+}
+
+async function getAllPastGames() {
+    const gamesFromDB = await DButils.execQuery(
+        `SELECT * FROM dbo.PastGames`
+    );
+
+    console.log('From BD:'); //DELETE THIS
+    console.log(gamesFromDB); //DELETE THIS
+
+    const promises = games.map(async (game) => {
+        return await extractRelevantPastGameData(game);
+    });
+
+    return Promise.all(promises);
+}
 
 exports.getNextGameInfo = getNextGameInfo;
-exports.extractRelevantFutureGameData = extractRelevantFutureGameData;
-exports.extractRelevantPastGameData = extractRelevantPastGameData;
+// exports.extractRelevantFutureGameData = extractRelevantFutureGameData;
+// exports.extractRelevantPastGameData = extractRelevantPastGameData;
 exports.getTeamsPastGames = getTeamsPastGames;
 exports.getTeamsFutureGames = getTeamsFutureGames;
+exports.getAllFutureGames = getAllFutureGames;
+exports.getAllPastGames = getAllPastGames;

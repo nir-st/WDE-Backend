@@ -155,7 +155,7 @@ paths:
             type: string
       responses:
         '200':
-          description: request succeed. returning list of player previews
+          description: 'request succeed. returning list of player previews'
           content:
             application/json:
               schema:
@@ -179,29 +179,61 @@ paths:
                 $ref: '#/components/schemas/FutureGame'
         '204':
           description: 'no future games were found'
+  /games/allFutureGames:
+    get:
+      tags:
+        - Games
+      summary: info about the all future games
+      responses:
+        '200':
+          description: 'request succeed. returning details about all future games'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FutureGame'
+        '204':
+          description: 'no future games were found'
+  /games/allPastGames:
+    get:
+      tags:
+        - Games
+      summary: info about the all past games
+      responses:
+        '200':
+          description: 'request succeed. returning details about all past game'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PastGame'
+        '204':
+          description: 'no future games were found'
 components:
   schemas:
     User:
       type: object
-      description: Model containing user info
+      description: 'Model containing user info'
       properties:
         username:
           type: string
           minLength: 3
           maxLength: 8
-          description: username. contains 3-8 lettters only
-          example: bigboi
+          description: 'username. contains 3-8 lettters only'
+          example: papajones
         firstname:
           type: string
-          description: The user's first name
-          example: John
+          description: "The user's first name"
+          example: Papa
         lastname:
           type: string
-          description: The user's last name
-          example: Cena
+          description: "The user's last name"
+          example: Jones
         country:
           type: string
-          description: The user's country
+          description: "The user's country"
           example: Israel
         password:
           type: string
@@ -209,11 +241,11 @@ components:
           minLength: 5
           maxLength: 10
           description: The user's password. 5-10 chars. At least 1 digit and 1 special char.
-          example: as3hm4l@
+          example: "as3hm4l@"
         email:
           type: string
           format: email
-          description: The user's email address
+          description: "The user's email address"
           example: john@cena.com
         image-url:
           type: string
@@ -229,14 +261,14 @@ components:
           minLength: 3
           maxLength: 8
           description: username. contains 3-8 lettters only
-          example: bigboi
+          example: papajones
         password:
           type: string
           format: password
           minLength: 5
           maxLength: 10
           description: The user's password. 5-10 chars. At least 1 digit and 1 special char.
-          example: as3hm4l@
+          example: "as3hm4l@"
     League:
       type: object
       properties:

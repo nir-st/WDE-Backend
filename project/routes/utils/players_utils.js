@@ -68,7 +68,6 @@ async function getPlayerPreviewsByName(player_name) {
   });
 
   players.data.data.map((player) => {
-    console.log(player.team); // DELETE THIS
     if (player.team != null && player.team.data.league != null && player.team.data.league.data.id == LEAGUE_ID) {
       league_players.push({
         id: player.player_id,

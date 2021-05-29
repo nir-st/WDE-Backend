@@ -21,7 +21,7 @@ router.get("/teamFullDetails/:teamId", async (req, res, next) => {
       id: req.params.teamId,
       name: team_info.name,
       founded: team_info.founded,
-      logoPath: team_info.logoPath,
+      logoPath: team_info.logo_path,
       players: team_players,
       pastGames: team_past_games,
       futureGames: team_future_games,
