@@ -36,7 +36,7 @@ router.post("/Login", async (req, res, next) => {
   try {
     const user = (
       await DButils.execQuery(
-        `SELECT * FROM dbo.Users WHERE UserName = '${req.body.username}'`
+        `SELECT * FROM dbo.Users WHERE Username = '${req.body.username}'`
       )
     )[0];
     // user = user[0];
@@ -47,7 +47,7 @@ router.post("/Login", async (req, res, next) => {
     }
 
     // Set cookie
-    req.session.user_id = user.user_id;
+    req.session.username = user.Username;
 
     // return cookie
     res.status(200).send("Login succeeded.");

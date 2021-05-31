@@ -211,6 +211,66 @@ paths:
                   $ref: '#/components/schemas/PastGame'
         '204':
           description: 'no future games were found'
+  /games/futureGame:
+    post:
+      tags:
+      - Games
+      summary: add a new future game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FutureGame'
+      responses:
+        '201':
+          description: 'request succeed. new game has been added'
+        '400':
+          description: 'wrong input parameters'
+        '401':
+          description: 'no permissions'
+        '409':
+          description: 'game id already exist'
+  /users/FavoriteGames:
+    get:
+      tags:
+      - Users
+      - Games
+      summary: get all user's favorite games
+      responses:
+        '200':
+          description: "request succeed. returning all user's favorite games"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FutureGame'
+        '204':
+          description: 'user have no farorite games'
+        '401':
+          description: 'no permissions'
+    post:
+      tags:
+        - Users
+        - Games
+      summary: "add a new game to users's favorite games"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gameId:
+                  type: integer
+                  description: the id of the game to be added
+                  example: 29
+      responses:
+        '201':
+          description: 'game has been added successfully'
+        '401':
+          description: 'no permissions'
 components:
   schemas:
     User:
@@ -415,8 +475,12 @@ components:
           example: 9
         stadium:
           type: string
-          description: name of the stadium the game will take place in
+          description: "name of the stadium the game will take place in"
           example: 'Estádio do Dragão'
+        referee:
+          type: string
+          description: "referee's name"
+          example: Donald Duck
     PastGame:
       type: object
       properties:
@@ -459,6 +523,10 @@ components:
           description: array of the game's event
           items:
             $ref: "#/components/schemas/GameEvent"
+        referee:
+          type: string
+          description: "referee's name"
+          example: Donald Duck
     GameEvent:
       type: object
       properties:
