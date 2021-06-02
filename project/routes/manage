@@ -1,0 +1,52 @@
+var express = require("express");
+var router = express.Router();
+const DButils = require("./utils/DButils");
+const games_utils = require("./utils/games_utils");
+
+router.use(async function (req, res, next) {
+  if (req.session && req.session.username) {
+    DButils.execQuery("SELECT Username FROM dbo.Users WHERE Permissions=1")
+      .then((users) => {
+        if (users.find((x) => x.Username === req.session.username)) {
+          
+          next();req.username = req.session.username;
+        }
+        else {
+          res.sendStatus(403);
+        }
+      })
+      .catch((err) => next(err));
+  } else {
+    res.sendStatus(401);
+  }
+});
+
+router.post("/addNewGame", async (req, res, next) => {
+  try {
+    const {year, month, day, time, homeTeamId, awayTeamId, stadium, referee} = req.body;
+
+    if (games_utils.validateTimeAndDate(year, month, day, time)) {
+      const timeStamp = year.concat(month).concat(day).concat(time.replace(':', ''));
+      const game_id = await games_utils.getAvailableGameId();
+      const new_game = {
+        gameId: game_id[0][''] + 1,
+        date: year.concat('-').concat(month).concat('-').concat(day),
+        time: time,
+        timeStamp: timeStamp,
+        homeTeamId: homeTeamId,
+        awayTeamId: awayTeamId,
+        stadium: stadium,
+        referee: referee,
+      };
+      await games_utils.addNewGame(new_game);
+      res.status(201).send("The game was succesfully added");
+    }
+    else {
+      res.status(400).send('bad input');
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = router;

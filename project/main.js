@@ -55,6 +55,7 @@ const teams = require("./routes/teams");
 const players = require("./routes/players");
 const games = require("./routes/games");
 const search = require("./routes/search");
+const manage = require("./routes/manage");
 
 //#endregion
 
@@ -85,6 +86,7 @@ app.use("/teams", teams);
 app.use("/players", players);
 app.use("/games", games);
 app.use("/search", search);
+app.use("/manage", manage);
 app.use(auth);
 
 app.use(function (err, req, res, next) {

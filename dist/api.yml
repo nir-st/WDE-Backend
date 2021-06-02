@@ -14,6 +14,7 @@ tags:
   - name: Teams
   - name: Games
   - name: Search
+  - name: Manage
 paths:
   /login:
     post:
@@ -115,7 +116,24 @@ paths:
               schema:
                   $ref: '#/components/schemas/Team'
         '404':
-          description: team id does not exist
+          description: "team id does not exist"
+  /teams/allTeams:
+    get:
+      tags:
+      - Teams
+      - League
+      summary: get a list of all the team names
+      responses:
+        '200':
+          description: request succeed. returning all team names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamPreview'
+        '204':
+          description: 'no teams found'
   /search/teams/{teamName}:
     get:
       tags:
@@ -231,6 +249,22 @@ paths:
           description: 'no permissions'
         '409':
           description: 'game id already exist'
+  /games/referees:
+    get:
+      tags:
+      - Games
+      summary: get a list of all referees
+      responses:
+        '200':
+          description: 'rqeuest succeed. returning a list of all referees'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Referee"
+        '204':
+          description: 'no referees found'
   /users/FavoriteGames:
     get:
       tags:
@@ -270,6 +304,28 @@ paths:
         '201':
           description: 'game has been added successfully'
         '401':
+          description: 'no permissions'
+  /manage/addNewGame:
+    post:
+      tags:
+      - Games
+      - League
+      - Manage
+      summary: "add a new game to the league"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewGame"
+      responses:
+        '201':
+          description: 'game was added succesfully'
+        '400':
+          description: 'bad input parameters'
+        '401':
+          description: 'unauthorized'
+        '403':
           description: 'no permissions'
 components:
   schemas:
@@ -527,6 +583,42 @@ components:
           type: string
           description: "referee's name"
           example: Donald Duck
+    NewGame:
+      type: object
+      properties:
+        year:
+          type: string
+          description: year of the game
+          example: '2021'
+        month:
+          type: string
+          description: month of the game
+          example: '07'
+        day:
+          type: string
+          description: day of the game
+          example: '25'
+        time:
+          type: string
+          format: time
+          description: the time the game starts
+          example: '21:00'
+        homeTeamId:
+          type: integer
+          description: id of the home team
+          example: 8
+        awayTeamId:
+          type: integer
+          description: id of the away team
+          example: 9
+        stadium:
+          type: string
+          description: "name of the stadium the game will take place in"
+          example: 'Estádio do Dragão'
+        referee:
+          type: string
+          description: "referee's name"
+          example: Donald Duck
     GameEvent:
       type: object
       properties:
@@ -556,3 +648,14 @@ components:
           type: string
           description: a description of the event
           example: Goal - Nimni
+    Referee:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: id of the referee
+          example: 14
+        name:
+          type: string
+          description: name of the referee
+          example: alice

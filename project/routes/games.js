@@ -50,4 +50,18 @@ router.get("/allPastGames", async (req, res, next) => {
   }
 });
 
+router.get("/Referees", async(req, res, next) => {
+  try{
+    const names = await games_utils.getAllReferees();
+    if (names.length == 0) {
+      res.status(204).send('no referees found');
+    }
+    else {
+      res.status(200).send(names);
+    }
+  } catch(err) {
+    res.status(400).send(err);
+  }
+});
+
 module.exports = router;

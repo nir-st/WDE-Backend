@@ -5,6 +5,34 @@ const players_utils = require("./utils/players_utils");
 const games_utils = require("./utils/games_utils");
 const teams_utils = require("./utils/teams_utils");
 
+router.get("/teamId/:teamName", async(req, res, next) => {
+  try {
+    const team_id = await teams_utils.getTeamId(req.params.teamName);
+    if (team_id == -1) {
+      res.status(204).send('team not found');
+    }
+    else {
+      res.status(200).send(team_id);
+    }
+  } catch(err) {
+    next(err);
+  }
+});
+
+router.get("/allTeams", async(req, res, next) => {
+  try {
+    team_names = await teams_utils.getAllTeams();
+    if (team_names.length == 0) {
+      res.status(204).send('no teams found')
+    }
+    else {
+      res.status(200).send(team_names);
+    }
+  } catch(err) {
+    res.status(404);
+  }
+});
+
 router.get("/teamFullDetails/:teamId", async (req, res, next) => {
   let team_players = [];
   try {

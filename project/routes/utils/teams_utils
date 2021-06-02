@@ -2,6 +2,7 @@ const axios = require("axios");
 const { getLeagueDetails } = require("./league_utils");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const LEAGUE_ID = 271;
+const COUNTRY_ID = 320;
 
 async function getTeamInfo(team_id) {
   const team = await axios.get(`${api_domain}/teams/${team_id}`, {
@@ -44,5 +45,34 @@ async function getTeamPreviewsByName(team_name) {
 
 }
 
+async function getAllTeams() {
+  try {
+    const league_teams = []
+    const all_teams = await axios.get(
+      `https://soccer.sportmonks.com/api/v2.0/countries/${COUNTRY_ID}/teams`,
+      {
+        params: {
+          include: 'league',
+          api_token: process.env.api_token,
+        },
+      }
+    );
+    all_teams.data.data.forEach(team => {
+      if (team.league.data.id = LEAGUE_ID) {
+        league_teams.push(
+          {
+            id: team.id,
+            name: team.name,
+            logoPath: team.logo_path,
+          });
+      }
+    });
+    return league_teams; 
+  } catch(err) {
+    throw new Error(err);
+  }
+}
+
 exports.getTeamInfo = getTeamInfo;
 exports.getTeamPreviewsByName = getTeamPreviewsByName;
+exports.getAllTeams = getAllTeams;

@@ -1,4 +1,4 @@
-const { executionAsyncResource } = require("async_hooks");
+const axios = require("axios");
 const DButils = require("./DButils");
 
 async function getTeamsPastGames(teamId) {
@@ -126,12 +126,68 @@ async function checkFutureGameExists(game_id) {
     return true;
 }
 
+function validateTimeAndDate(year, month, day, time) {
+    // date should be yyyy/mm/dd
+    // time should be hh:mm
+    try {
+        if (month.length != 2) {
+            return false;
+        }
+        if (day.length != 2) {
+            return false;
+        }
+        const given_date = year.concat('/').concat(month).concat('/').concat(day);
+        const test_date = new Date(given_date);
+        
+        if (!/^([0:1][0-9]|2[0-3]):[0-5][0-9]$/.test(time)) {
+            return false;
+        }
+        return true;
+
+    } catch (error) {
+        return false;
+    }
+}
+
+async function getAvailableGameId() {
+    return new Promise(async (resolve, reject) => {
+        resolve (await DButils.execQuery(
+            `SELECT MAX(GameId) FROM dbo.FutureGames`
+        ));
+    });
+}
+
+async function addNewGame(new_game) {
+    const {gameId, date, time, timeStamp, homeTeamId, awayTeamId, stadium, referee} = new_game;
+    return new Promise(async (resolve, reject) => {
+        resolve(
+            await DButils.execQuery(
+                `INSERT INTO dbo.FutureGames (GameId, Date, Time, TimeStamp, HomeTeamId, AwayTeamId, Stadium, Referee)
+                VALUES (${gameId}, '${date}', '${time}', '${timeStamp}', '${homeTeamId}', '${awayTeamId}', '${stadium}', '${referee}');`
+            )
+        );
+    });
+}
+
+async function getAllReferees() {
+    return new Promise(async (resolve, reject) => {
+        resolve(
+            await DButils.execQuery(
+                `SELECT * FROM dbo.Referees;`
+            )
+        );
+    });
+}
+
+
 exports.getNextGameInfo = getNextGameInfo;
-// exports.extractRelevantFutureGameData = extractRelevantFutureGameData;
-// exports.extractRelevantPastGameData = extractRelevantPastGameData;
 exports.getTeamsPastGames = getTeamsPastGames;
 exports.getTeamsFutureGames = getTeamsFutureGames;
 exports.getAllFutureGames = getAllFutureGames;
 exports.getAllPastGames = getAllPastGames;
 exports.getGamesInfoByIds = getGamesInfoByIds;
 exports.checkFutureGameExists = checkFutureGameExists;
+exports.validateTimeAndDate = validateTimeAndDate;
+exports.getAvailableGameId = getAvailableGameId;
+exports.addNewGame = addNewGame;
+exports.getAllReferees = getAllReferees;
