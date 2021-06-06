@@ -23,49 +23,15 @@ router.use(async function (req, res, next) {
   }
 });
 
-/**
- * This path gets body with playerId and save this player in the favorites list of the logged-in user
- */
-router.post("/favoritePlayers", async (req, res, next) => {
-  try {
-    const username = req.session.username;
-    const player_id = req.body.playerId;
-    await users_utils.markPlayerAsFavorite(user_id, player_id);
-    res.status(201).send("The player successfully saved as favorite");
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * This path returns the favorites players that were saved by the logged-in user
- */
-router.get("/favoritePlayers", async (req, res, next) => {
-  try {
-    const username = req.session.username;
-    let favorite_players = {};
-    const player_ids = await users_utils.getFavoritePlayers(user_id);
-    let player_ids_array = [];
-    player_ids.map((element) => player_ids_array.push(element.player_id)); //extracting the players ids into array
-    const results = await players_utils.getPlayersInfo(player_ids_array);
-    res.status(200).send(results);
-  } catch (error) {
-    next(error);
-  }
-});
-
 router.get("/favoriteGames", async (req, res, next) => {
   try {
     const username = req.session.username;
-    console.log(username);
     const game_ids = await users_utils.getFavoriteGames(username);
     if (!game_ids || game_ids.length == 0) {
       res.status(204).send('no favorite games');
     }
     else {
       const results = await games_utils.getGamesInfoByIds(game_ids);
-      console.log('results')
-      console.log(results)
       res.status(200).send(results);
     }
   } catch (error) {

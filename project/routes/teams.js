@@ -34,13 +34,16 @@ router.get("/allTeams", async(req, res, next) => {
 });
 
 router.get("/teamFullDetails/:teamId", async (req, res, next) => {
+  const team_info = await teams_utils.getTeamInfo(req.params.teamId);
+  if (team_info == null) {
+    res.sendStatus(204);
+  }
   let team_players = [];
   try {
     team_players = await players_utils.getPlayersByTeam(
       req.params.teamId
     );
     
-    const team_info = await teams_utils.getTeamInfo(req.params.teamId);
     const team_past_games = await games_utils.getTeamsPastGames(req.params.teamId);
     const team_future_games = await games_utils.getTeamsFutureGames(req.params.teamId);
     

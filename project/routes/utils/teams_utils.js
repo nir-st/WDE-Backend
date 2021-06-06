@@ -5,19 +5,27 @@ const LEAGUE_ID = 271;
 const COUNTRY_ID = 320;
 
 async function getTeamInfo(team_id) {
-  const team = await axios.get(`${api_domain}/teams/${team_id}`, {
-    params: {
-      api_token: process.env.api_token,
-    },
-  });
+  try {
+    const team = await axios.get(`${api_domain}/teams/${team_id}`, {
+      params: {
+        include: 'league',
+        api_token: process.env.api_token,
+      },
+    });
 
-  const {name, logo_path, venue_id, founded} = team.data.data;
+    if (!team || !team.data.data.league || team.data.data.league.data.id != LEAGUE_ID) {
+      return null;
+    }
+    const {name, logo_path, venue_id, founded} = team.data.data;
 
-  return {
-      name: name,
-      logo_path: logo_path,
-      founded: founded,
-  };
+    return {
+        name: name,
+        logo_path: logo_path,
+        founded: founded,
+    };
+   } catch (error) { 
+     return null; 
+    }
 }
 
 async function getTeamPreviewsByName(team_name) {

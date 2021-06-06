@@ -1,5 +1,6 @@
 //#region global imports
 const DButils = require("./routes/utils/DButils");
+const games_utils = require("./routes/utils/games_utils");
 const axios = require("axios");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
@@ -60,7 +61,8 @@ const manage = require("./routes/manage");
 //#endregion
 
 //#region cookie middleware
-app.use(function (req, res, next) {
+app.use(async function (req, res, next) {
+  await games_utils.updatePastFutureGames();
   if (req.session && req.session.username) {
     DButils.execQuery("SELECT username FROM Users")
       .then((users) => {

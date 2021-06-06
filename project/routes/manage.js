@@ -8,8 +8,8 @@ router.use(async function (req, res, next) {
     DButils.execQuery("SELECT Username FROM dbo.Users WHERE Permissions=1")
       .then((users) => {
         if (users.find((x) => x.Username === req.session.username)) {
-          
-          next();req.username = req.session.username;
+          req.username = req.session.username;
+          next();
         }
         else {
           res.sendStatus(403);
@@ -18,6 +18,31 @@ router.use(async function (req, res, next) {
       .catch((err) => next(err));
   } else {
     res.sendStatus(401);
+  }
+});
+
+router.post("/gameEvent", async (req, res, next) => {
+  try {
+    const {GameId, Date, Time, GameMinute, Description} = req.body;
+    const succeed = await games_utils.addNewGameEvent(GameId, Date, Time, GameMinute, Description);
+    if (succeed) {
+      res.status(201).send('game event successfully added');
+    }
+    else {
+      res.status(204).send('game id was not found');
+    }
+  } catch(err) {
+    res.status(400).send(err);
+  }
+});
+
+router.post("/updateGameScore", async (req, res, next) => {
+  try {
+    const {gameId, homeTeamScore, awayTeamScore} = req.body;
+    await games_utils.updateGameScore(gameId, homeTeamScore, awayTeamScore);
+    res.status(201).send('game score successfully updated');
+  } catch(err) {
+    res.status(400).send(err);
   }
 });
 

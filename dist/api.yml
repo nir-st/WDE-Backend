@@ -59,7 +59,7 @@ paths:
       responses:
         '200':
           description: 'logged out successfully'
-  /players/playerDetails/{playerId}:
+  /players/player/{playerId}:
     get:
       tags:
       - Players
@@ -78,6 +78,27 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/Player'
+        '204':
+          description: player id was not found
+  /players/preview/{playerId}:
+    get:
+      tags:
+      - Players
+      summary: get preview on a player
+      parameters:
+        - in: path
+          name: playerId
+          description: player's ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'request succeed. returning player preview'
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/PlayerPreview'
         '404':
           description: player id was not found
   /league/getDetails:
@@ -115,7 +136,7 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/Team'
-        '404':
+        '204':
           description: "team id does not exist"
   /teams/allTeams:
     get:
@@ -162,7 +183,7 @@ paths:
     get:
       tags:
         - Search
-        - Player
+        - Players
       summary: get preview of players with that name in the leageu
       parameters:
         - in: path
@@ -229,26 +250,6 @@ paths:
                   $ref: '#/components/schemas/PastGame'
         '204':
           description: 'no future games were found'
-  /games/futureGame:
-    post:
-      tags:
-      - Games
-      summary: add a new future game
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FutureGame'
-      responses:
-        '201':
-          description: 'request succeed. new game has been added'
-        '400':
-          description: 'wrong input parameters'
-        '401':
-          description: 'no permissions'
-        '409':
-          description: 'game id already exist'
   /games/referees:
     get:
       tags:
@@ -327,6 +328,50 @@ paths:
           description: 'unauthorized'
         '403':
           description: 'no permissions'
+  /manage/updateGameScore:
+    post:
+      tags:
+      - Games
+      - Manage
+      summary: "update past game's score"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GameScore"
+      responses:
+        '201':
+          description: "game score successfully updated"
+        '400':
+          description: "bad request"
+        '401':
+          description: "unauthenticated"
+        '403':
+          description: "forbidden"
+  /manage/gameEvent:
+    post:
+      tags:
+      - Games
+      - Manage
+      summary: "add a new game event"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GameEvent"
+      responses:
+        '201':
+          description: "game event successfully added"
+        '204':
+          description: "game id was not found"
+        '400':
+          description: "bad request"
+        '401':
+          description: "unauthenticated"
+        '403':
+          description: "forbidden"
 components:
   schemas:
     User:
@@ -363,7 +408,7 @@ components:
           format: email
           description: "The user's email address"
           example: john@cena.com
-        image-url:
+        image_url:
           type: string
           format: URL
           description: URL for the user's image
@@ -400,35 +445,6 @@ components:
           type: string
           description: current stage name
           example: Championship Round
-    Player:
-      type: object
-      description: Full details of a player
-      properties:
-        id:
-          type: integer
-          description: players's ID
-          example: 123456789
-        name:
-          type: string
-          description: player's full name
-          example: 'Avi Nimni'
-        teamName:
-          type: string
-          description: player's team name
-          example: 'Maccabi Tel-Aviv'
-        position:
-          type: integer
-          description: player's position in the team
-          example: 1
-        image_url:
-          type: string
-          format: URL
-          description: URL for the player's image
-          example: https://cloudinaru.com/aviNimni
-        age:
-          type: integer
-          description: player's age
-          example: 30
     PlayerPreview:
       type: object
       description: A preview of a player
@@ -454,6 +470,52 @@ components:
           format: URL
           description: URL for the player's image
           example: https://cloudinaru.com/aviNimni
+    Player:
+      type: object
+      description: Full details of a player
+      properties:
+        id:
+          type: integer
+          description: players's ID
+          example: 123456789
+        fullname:
+          type: string
+          description: player's full name
+          example: 'Avi Nimni'
+        commonName:
+          type: string
+          description: player's common name
+          example: 'A. Nimni'
+        teamName:
+          type: string
+          description: player's team name
+          example: 'Maccabi Tel-Aviv'
+        positionId:
+          type: integer
+          description: player's position in the team
+          example: 1
+        image_url:
+          type: string
+          format: URL
+          description: URL for the player's image
+          example: https://cloudinaru.com/aviNimni
+        birthDate:
+          type: string
+          format: date
+          description: player's birth date
+          example: "07/07/1970"
+        birthCountry:
+          type: string
+          description: the player's birth country
+          example: "Scotland"
+        height:
+          type: string
+          description: the player's height
+          example:  "172 cm"
+        weight:
+          type: string
+          description: the player's weight
+          example:  "84 kg"
     TeamPreview:
       type: object
       description: team's preview for the search
@@ -521,6 +583,10 @@ components:
           format: time
           description: the time the game starts
           example: '21:00'
+        timeStamp:
+          type: number
+          description: time stamp of the game
+          example: 202107252100
         homeTeamId:
           type: integer
           description: id of the home team
@@ -554,6 +620,10 @@ components:
           format: time
           description: the time the game starts
           example: '21:00'
+        timeStamp:
+          type: number
+          description: the game's time stamp
+          example: 202107212100
         homeTeamId:
           type: integer
           description: id of the home team
@@ -622,29 +692,25 @@ components:
     GameEvent:
       type: object
       properties:
-        id:
-          type: integer
-          description: id of the event
-          example: 23
-        gameId:
+        GameId:
           type: integer
           description: id of the game
           example: 24
-        date:
+        Date:
           type: string
           format: date
           description: date of the event
-          example: 2020-05-24
-        time:
+          example: "2020-05-24"
+        Time:
           type: string
           format: time
           description: the time the event took place
-          example: 22:12
-        gameMinute:
+          example: "22:12"
+        GameMinute:
           type: integer
           description: the minute in the game the event took place
           example: 89
-        description:
+        Description:
           type: string
           description: a description of the event
           example: Goal - Nimni
@@ -659,3 +725,18 @@ components:
           type: string
           description: name of the referee
           example: alice
+    GameScore:
+      type: object
+      properties:
+        gameId:
+          type: integer
+          description: "id of the game to be updated"
+          example: 6
+        homeTeamScore:
+          type: integer
+          description: "home team score"
+          example: 3
+        awayTeamScore:
+          type: integer
+          description: "away team score"
+          example: 2

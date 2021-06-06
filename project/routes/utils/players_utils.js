@@ -34,19 +34,69 @@ async function getPlayersInfo(players_ids_list) {
   return extractRelevantPlayerData(players_info);
 }
 
-function extractRelevantPlayerData(players_info) {
+async function getPlayersPreviews(players_ids_list) {
+  let promises = [];
+  players_ids_list.map((id) =>
+    promises.push(
+      axios.get(`${api_domain}/players/${id}`, {
+        params: {
+          api_token: process.env.api_token,
+          include: "team",
+        },
+      })
+    )
+  );
+  let players_info = await Promise.all(promises);
+  return extractPlayersPreviews(players_info);
+}
+
+function extractPlayersPreviews(players_info) {
   return players_info.map((player_info) => {
-    const { id, fullname, image_path, position_id } = player_info.data.data;
+    const { player_id, fullname, image_path, position_id } = player_info.data.data;
     const { name } = player_info.data.data.team.data;
 
     return {
-      id: id,
+      id: player_id,
       fullname: fullname,
-      image_url: image_path,
-      positionId: position_id,
       teamName: name,
+      positionId: position_id,
+      image_url: image_path,
     };
   });
+}
+
+function extractRelevantPlayerData(players_info) {
+  return players_info.map((player_info) => {
+    if (!players_info) { return; }
+    const { player_id, fullname, image_path, position_id, birthcountry, common_name, nationality, height, birthdate, weight } = player_info.data.data;
+    if (!player_info.data.data.team) { return; }
+    const { name } = player_info.data.data.team.data;
+
+    return {
+      id: player_id,
+      fullname: fullname,
+      commonName: common_name,
+      teamName: name,
+      positionId: position_id,
+      image_url: image_path,
+      birthDate: birthdate, 
+      birthCountry: birthcountry,
+      nationality: nationality,
+      height: height,
+      weight: weight,
+    };
+  });
+}
+
+function getAge(dateString) {
+  let today = new Date();
+  let birthDate = new Date(dateString);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  let m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+  }
+  return age;
 }
 
 async function getPlayersByTeam(team_id) {
@@ -84,3 +134,4 @@ async function getPlayerPreviewsByName(player_name) {
 exports.getPlayersByTeam = getPlayersByTeam;
 exports.getPlayersInfo = getPlayersInfo;
 exports.getPlayerPreviewsByName = getPlayerPreviewsByName;
+exports.getPlayersPreviews = getPlayersPreviews;
