@@ -63,4 +63,15 @@ router.get("/teamFullDetails/:teamId", async (req, res, next) => {
   }
 });
 
+router.get("/teamName/:teamId", async (req, res, next) => {
+  const team_info = await teams_utils.getTeamInfo(req.params.teamId);
+  if (team_info == null) {
+    res.sendStatus(204);
+    return;
+  }
+  res.send(
+    team_info.name
+  );
+});
+
 module.exports = router;
