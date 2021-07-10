@@ -155,6 +155,26 @@ paths:
                   $ref: '#/components/schemas/TeamPreview'
         '204':
           description: 'no teams found'
+  /teams/teamName/{teamId}:
+    get:
+      tags:
+      - Teams
+      summary: get team's name
+      parameters:
+        - in: path
+          name: teamId
+          description: team's id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: request succeed. Returning team's name
+          content:
+            schema:
+              type: String
+        '204':
+          description: 'team not found'
   /search/teams/{teamName}:
     get:
       tags:
@@ -272,6 +292,13 @@ paths:
       - Users
       - Games
       summary: get all user's favorite games
+      parameters:
+        - in: path
+          name: username
+          description: username
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: "request succeed. returning all user's favorite games"
@@ -301,6 +328,10 @@ paths:
                   type: integer
                   description: the id of the game to be added
                   example: 29
+                username:
+                  type: string
+                  description: username
+                  example: philip
       responses:
         '201':
           description: 'game has been added successfully'
