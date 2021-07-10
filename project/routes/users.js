@@ -8,20 +8,20 @@ const games_utils = require("./utils/games_utils");
 /**
  * Authenticate all incoming requests by middleware
  */
-router.use(async function (req, res, next) {
-  if (req.session && req.session.username) {
-    DButils.execQuery("SELECT Username FROM dbo.Users")
-      .then((users) => {
-        if (users.find((x) => x.Username === req.session.username)) {
-          req.username = req.session.username;
-          next();
-        }
-      })
-      .catch((err) => next(err));
-  } else {
-    res.sendStatus(401);
-  }
-});
+// router.use(async function (req, res, next) {
+//   if (req.session && req.session.username) {
+//     DButils.execQuery("SELECT Username FROM dbo.Users")
+//       .then((users) => {
+//         if (users.find((x) => x.Username === req.session.username)) {
+//           req.username = req.session.username;
+//           next();
+//         }
+//       })
+//       .catch((err) => next(err));
+//   } else {
+//     res.sendStatus(401);
+//   }
+// });
 
 router.get("/favoriteGames", async (req, res, next) => {
   try {
