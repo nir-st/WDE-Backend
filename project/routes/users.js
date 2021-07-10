@@ -25,7 +25,8 @@ const games_utils = require("./utils/games_utils");
 
 router.get("/favoriteGames", async (req, res, next) => {
   try {
-    const username = req.session.username;
+    // const username = req.session.username;
+    const username = req.body.username;
     const game_ids = await users_utils.getFavoriteGames(username);
     if (!game_ids || game_ids.length == 0) {
       res.status(204).send('no favorite games');
@@ -47,7 +48,8 @@ router.post("/favoriteGames", async (req, res, next) => {
       res.status(400).send('bad game id');
     }
     else {
-      const username = req.session.username;
+      // const username = req.session.username;
+      const username = req.body.username;
       const game_ids = await users_utils.markGameAsFavorite(game_id, username);
       res.status(201).send('game has been added to favorites!');
     }
